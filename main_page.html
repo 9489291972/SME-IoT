@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6ab04c, #2980b9);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #fff;
+            font-weight: normal;
+        }
+
+        h3 {
+            font-size: 28px;
+            margin-top: 40px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .reports-container {
+            display: flex;
+            justify-content: space-evenly;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 30px;
+            gap: 40px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .report-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 45%;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .report-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .report-card img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 12px 25px;
+            background: #2980b9;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        a:hover {
+            background: #6ab04c;
+            box-shadow: 0 4px 10px rgba(106, 176, 76, 0.3);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card h4 {
+            font-size: 20px;
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 18px;
+            color: #333;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .reports-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .stat-card {
+                width: 150px;
+            }
+
+            .report-card {
+                width: 80%;
+            }
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ session['user'] }}!</h1>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <h4>Current</h4>
+            <p id="current">{{ current }} A</p>
+        </div>
+        <div class="stat-card">
+            <h4>Voltage</h4>
+            <p id="voltage">{{ voltage }} V</p>
+        </div>
+    </div>
+
+    <h3>Reports</h3>
+    <div class="reports-container">
+        <div class="report-card">
+            <h3>Weekly Report</h3>
+            <img src="data:image/png;base64,{{ weekly_report }}" alt="Weekly Report">
+        </div>
+
+        <div class="report-card">
+            <h3>Monthly Report</h3>
+            <img src="data:image/png;base64,{{ monthly_report }}" alt="Monthly Report">
+        </div>
+    </div>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+    <script>
+        // Function to update current and voltage values
+        function updateValues() {
+            fetch('/get_current_voltage')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('current').innerText = `${data.current} A`;
+                    document.getElementById('voltage').innerText = `${data.voltage} V`;
+                })
+                .catch(error => console.error('Error updating values:', error));
+        }
+
+        // Call updateValues every 3 seconds
+        setInterval(updateValues, 3000);
+
+        // Initial call to populate the data immediately
+        updateValues();
+    </script>
+</body>
+</html>
